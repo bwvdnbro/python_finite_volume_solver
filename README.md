@@ -13,3 +13,7 @@ This repository contains:
   - `LICENSE`: The free software license that allows redistribution of the
     Python scripts mentioned above.
   - `README.md`: This file.
+  - `RiemannSolver.hpp`: A C++ version of the Riemann solver, which is identical
+    to the Riemann solver in https://github.com/bwvdnbro/CMacIonize.
+  - `riemann.f`: A Fortran (77) version of the Riemann solver, kindly provided
+    by Kenneth Wood.
