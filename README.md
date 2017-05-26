@@ -19,3 +19,5 @@ This repository contains:
     to the Riemann solver in https://github.com/bwvdnbro/CMacIonize.
   - `riemann.f`: A Fortran (77) version of the Riemann solver, kindly provided
     by Kenneth Wood.
+  - `example_solutions`: Example solutions for the practical exercise. These are
+    only intended as a guidance; you should definitely try to write your own!
