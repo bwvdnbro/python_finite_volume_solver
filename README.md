@@ -7,6 +7,8 @@ This repository contains:
     finite volume schemes that serve as an introduction to the tutorial.
   - `finite_volume_schemes_single_file.pdf`: More compact version of the slides
     above that does not refer to the slides from Moira's fluids course.
+  - `multidimensional_finite_volume_schemes.pdf`: Extra slides that explain how
+    to go from a 1D finite volume solver to a multidimensional one.
   - `riemannsolver.py`: A standalone exact Riemann solver that can be used as an
     external library for the tutorial.
   - `sodshock_solution.py`: A Python script that returns a reference solution
