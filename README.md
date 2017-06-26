@@ -9,6 +9,8 @@ This repository contains:
     above that does not refer to the slides from Moira's fluids course.
   - `multidimensional_finite_volume_schemes.pdf`: Extra slides that explain how
     to go from a 1D finite volume solver to a multidimensional one.
+  - `second_order_finite_volume_schemes.pdf`: Extra slides that explain how to
+    go from a first order to a second order scheme.
   - `riemannsolver.py`: A standalone exact Riemann solver that can be used as an
     external library for the tutorial.
   - `sodshock_solution.py`: A Python script that returns a reference solution
