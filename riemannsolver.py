@@ -651,7 +651,7 @@ class RiemannSolver:
           # variable used twice below
           base = self._tdgp1 + self._gm1dgp1 * (uL - dxdt) / aL
           rhosol = rhoL * base**self._tdgm1
-          usol = _tdgp1 * (aL + self._tdgm1 * uL + dxdt)
+          usol = self._tdgp1 * (aL + self._tdgm1 * uL + dxdt)
           Psol = PL * base**self._tgdgm1
         else:
           ## left state regime
