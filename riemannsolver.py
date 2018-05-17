@@ -784,6 +784,76 @@ class RiemannSolver:
       flag = -1
 
     return rhosol, usol, Psol, flag
+    
+  ##############################################################################
+  # @brief Solve the Riemann problem with the given left and right state for
+  # the velocity and pressure (but do not sample the solution).
+  #
+  # @param rhoL Left state density.
+  # @param uL Left state velocity.
+  # @param PL Left state pressure.
+  # @param rhoR Right state density.
+  # @param uR Right state velocity.
+  # @param PR Right state pressure.
+  # @return Velocity and pressure in the middle region.
+  ##############################################################################
+  def solve_middle_state(self, rhoL, uL, PL, rhoR, uR, PR):
+
+    # get the soundspeeds
+    aL = self.get_soundspeed(rhoL, PL)
+    aR = self.get_soundspeed(rhoR, PR)
+
+    # handle vacuum
+    if rhoL == 0. or rhoR == 0.:
+      print "Vacuum not handled yet!"
+      exit()
+
+    # handle vacuum generation
+    if self._tdgm1 * (aL + aR) <= uR - uL:
+      print "Vacuum not handled yet!"
+      exit()
+
+    # find the pressure and velocity in the middle state
+    # since this is an exact Riemann solver, this is an iterative process,
+    # whereby we basically find the root of a function (the Riemann f function
+    # defined above)
+    # we start by using a Newton-Raphson method, since we do not have an
+    # interval in which the function changes sign
+    # however, as soon as we have such an interval, we switch to a much more
+    # robust root finding method (Brent's method). We do this because the
+    # Newton-Raphson method in some cases can overshoot and return a negative
+    # pressure, for which the Riemann f function is not defined. Brent's method
+    # will never stroll outside of the initial interval in which the function
+    # changes sign.
+    Pstar = 0.
+    Pguess = self.guess_P(rhoL, uL, PL, aL, rhoR, uR, PR, aR)
+    # we only store this variable to store the sign of the function for pressure
+    # zero
+    # we need to find a larger pressure for which this sign changes to have an
+    # interval where we can use Brent's method
+    fPstar = self.f(rhoL, uL, PL, aL, rhoR, uR, PR, aR, Pstar)
+    fPguess = self.f(rhoL, uL, PL, aL, rhoR, uR, PR, aR, Pguess)
+    if fPstar * fPguess >= 0.:
+      # Newton-Raphson until convergence or until usable interval is found to
+      # use Brent's method
+      while abs(Pstar - Pguess) > 5.e-9 * (Pstar + Pguess) and fPguess < 0.:
+        Pstar = Pguess
+        Pguess = Pguess - fPguess / \
+                          self.fprime(rhoL, PL, aL, rhoR, PR, aR, Pguess)
+        fPguess = self.f(rhoL, uL, PL, aL, rhoR, uR, PR, aR, Pguess)
+
+    # As soon as there is a suitable interval: use Brent's method
+    if abs(Pstar - Pguess) > 5.e-9 * (Pstar + Pguess) and fPguess > 0.:
+      Pstar = self.solve_brent(rhoL, uL, PL, aL, rhoR, uR, PR, aR, Pstar,
+                               Pguess)
+    else:
+      Pstar = Pguess
+
+    # the middle state velocity is fixed once the middle state pressure is known
+    ustar = 0.5 * (uL + uR) + \
+            0.5 * (self.fb(rhoR, PR, aR, Pstar) - self.fb(rhoL, PL, aL, Pstar))
+
+    return ustar, Pstar
 
 ################################################################################
 ################################################################################
@@ -813,6 +883,29 @@ def relative_difference_smaller_than(A, B, relative_error):
 ################################################################################
 def relative_difference(A, B):
   return abs(A - B) / abs(A + B)
+
+################################################################################
+# @brief Run a basic Riemann solver test with given left and right state, and
+# given reference pressure solution.
+#
+# @param rhoL Left state density.
+# @param uL Left state velocity.
+# @param PL Left state pressure.
+# @param rhoR Right state density.
+# @param uR Right state velocity.
+# @param PR Right state pressure.
+# @param Pref Reference solution pressure.
+################################################################################
+def run_riemannsolver_basic_test(solver, rhoL, uL, PL, rhoR, uR, PR, Pref):
+
+  usol, Psol = solver.solve_middle_state(rhoL, uL, PL, rhoR, uR, PR)
+
+  if not relative_difference_smaller_than(Psol, Pref, 1.e-4):
+    print "Wrong pressure solution: {Psol}, should be {Pref}".format(
+      Psol = Psol, Pref = Pref)
+    print "(relative difference: {reldiff})!".format(
+      reldiff = relative_difference(Psol, Pref))
+    exit()
 
 ################################################################################
 # @brief Run a Riemann solver test with given left and right state, and given
@@ -869,9 +962,31 @@ if __name__ == "__main__":
         "Now that we're running anyway, we will quickly run some unit tests " \
         "to make sure everything still works...\n"
 
-  solver = RiemannSolver(5./3.)
-
   # Toro tests
+  solver = RiemannSolver(1.4)
+  run_riemannsolver_basic_test(solver,
+                               1., 0., 1.,
+                               0.125, 0., 0.1,
+                               0.30313)
+  run_riemannsolver_basic_test(solver,
+                               1., -2., 0.4,
+                               1., 2., 0.4,
+                               0.001894)
+  run_riemannsolver_basic_test(solver,
+                               1., 0., 1000.,
+                               1., 0., 0.01,
+                               460.894)
+  run_riemannsolver_basic_test(solver,
+                               1., 0., 0.01,
+                               1., 0., 100.,
+                               46.095)
+  run_riemannsolver_basic_test(solver,
+                               5.99924, 19.5975, 460.894,
+                               5.99242, -6.19633, 46.0950,
+                               1691.64)
+
+  # Toro tests with sampling and different adiabatic index
+  solver = RiemannSolver(5./3.)
   run_riemannsolver_test(solver,
                          1., 0., 1.,
                          0.125, 0., 0.1,
