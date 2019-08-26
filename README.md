@@ -25,3 +25,5 @@ This repository contains:
     by Kenneth Wood.
   - `example_solutions`: Example solutions for the practical exercise. These are
     only intended as a guidance; you should definitely try to write your own!
+  - `Riemann_problem.pdf`: A 59 slide document laying out the detailed solution
+    to the general Riemann problem.
