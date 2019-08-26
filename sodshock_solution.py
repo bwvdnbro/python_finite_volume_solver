@@ -69,36 +69,40 @@ import riemannsolver
 ################################################################################
 def get_solution(time):
 
-  # create the Riemann solver instance
-  solver = riemannsolver.RiemannSolver(5./3.)
+    # create the Riemann solver instance
+    solver = riemannsolver.RiemannSolver(5.0 / 3.0)
 
-  # set up the positions array
-  x = np.arange(0., 1., 0.001)
+    # set up the positions array
+    x = np.arange(0.0, 1.0, 0.001)
 
-  # sample the solution
-  rho = np.zeros(len(x))
-  u = np.zeros(len(x))
-  p = np.zeros(len(x))
-  for i in range(len(x)):
-    rho[i], u[i], p[i], _ = solver.solve(1., 0., 1., 0.125, 0., 0.1,
-                                         (x[i] - 0.5) / time)
+    # sample the solution
+    rho = np.zeros(len(x))
+    u = np.zeros(len(x))
+    p = np.zeros(len(x))
+    for i in range(len(x)):
+        rho[i], u[i], p[i], _ = solver.solve(
+            1.0, 0.0, 1.0, 0.125, 0.0, 0.1, (x[i] - 0.5) / time
+        )
 
-  return x, rho, u, p
+    return x, rho, u, p
+
 
 ################################################################################
 # @brief Default action when this file is run directly: plot the Sod shock
 # problem solution at t = 0.2 and exit.
 ################################################################################
 if __name__ == "__main__":
-  print "\nThis script should not be run directly. Instead, import it into " \
-        "another script and use its functionality there.\n" \
-        "Now that we're running anyway, we will just show the Sod shock " \
+    print(
+        "\nThis script should not be run directly. Instead, import it into "
+        "another script and use its functionality there.\n"
+        "Now that we're running anyway, we will just show the Sod shock "
         "problem solution at time t = 0.2.\n"
+    )
 
-  x, rho, u, p = get_solution(0.2)
+    x, rho, u, p = get_solution(0.2)
 
-  # import matplotlib for plotting
-  import pylab as pl
+    # import matplotlib for plotting
+    import pylab as pl
 
-  pl.plot(x, rho, "r-")
-  pl.show()
+    pl.plot(x, rho, "r-")
+    pl.show()
