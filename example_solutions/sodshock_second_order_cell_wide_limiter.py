@@ -242,7 +242,7 @@ for i in range(numstep):
       # the last cell does not have a right neigbhour: impose reflective
       # boundary conditions
       densityR = densityL
-      velocityR = -velocityR
+      velocityR = -velocityL
       pressureR = pressureL
       xR = 2. - cell._midpoint
       gradient_densityR = -cell._gradient_density

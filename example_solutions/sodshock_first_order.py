@@ -137,7 +137,7 @@ for i in range(numstep):
       # the last cell does not have a right neighbour: impose reflective
       # boundary conditions
       densityR = densityL
-      velocityR = -velocityR
+      velocityR = -velocityL
       pressureR = pressureL
     else:
       densityR = cell_right._density
