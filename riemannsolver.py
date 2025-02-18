@@ -216,7 +216,7 @@ class RiemannSolver:
         Pmin = min(PL, PR)
         Pmax = max(PL, PR)
         qmax = Pmax / Pmin
-        Ppv = 0.5 * (PL + PR) - 0.125 * (uR - uL) * (PL + PR) * (aL + aR)
+        Ppv = 0.5 * (PL + PR) - 0.125 * (uR - uL) * (rhoL + rhoR) * (aL + aR)
         Ppv = max(5.0e-9 * (PL + PR), Ppv)
         if qmax <= 2 and Pmin <= Ppv and Ppv <= Pmax:
             Pguess = Ppv
